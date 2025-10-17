@@ -3,6 +3,12 @@ import os
 from chatbot_agent import SmartChatAgent
 from dotenv import load_dotenv
 
+
+# Load from secrets.toml
+groq_api_key = st.secrets["GROQ_API_KEY"]
+
+# Optional: check if key loaded
+st.write("API Key loaded successfully:", bool(groq_api_key))
 # Load environment variables
 load_dotenv()
 
