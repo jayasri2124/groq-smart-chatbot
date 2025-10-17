@@ -1,0 +1,12 @@
+flask
+groq
+requests
+python-dotenv
+sentence-transformers
+faiss-cpu
+numpy
+pandas
+sqlalchemy
+streamlit
+
+
