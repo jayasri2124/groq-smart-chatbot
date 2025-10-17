@@ -1,0 +1,23 @@
+# Ignore Python virtual environment
+venv/
+__pycache__/
+*.pyc
+
+# Ignore uploaded files and data
+uploads/
+*.txt
+*.csv
+
+# Ignore environment and API key files
+.env
+*.env
+
+# Ignore OS / editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Ignore large folders
+models/
+node_modules/
