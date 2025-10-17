@@ -3,8 +3,6 @@ import os
 from chatbot_agent import SmartChatAgent
 from dotenv import load_dotenv
 
-<<<<<<< HEAD
-
 # Load from secrets.toml
 groq_api_key = st.secrets["GROQ_API_KEY"]
 
