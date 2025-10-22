@@ -1,21 +1,28 @@
-import streamlit as st
-import os
 from chatbot_agent import SmartChatAgent
 from dotenv import load_dotenv
+import os
+import streamlit as st
 
-# Load from secrets.toml
-groq_api_key = st.secrets["GROQ_API_KEY"]
-
-# Optional: check if key loaded
-st.write("API Key loaded successfully:", bool(groq_api_key))
-# Load environment variables
+# --- Load environment variables first ---
 load_dotenv()
 
-st.set_page_config(page_title="🤖 shine Smart Chatbot", page_icon="💬")
-st.title("💬 shine Smart Chatbot")
+# --- Get API Key (from .env or Streamlit secrets) ---
+groq_api_key = os.getenv("GROQ_API_KEY", None)
+
+if not groq_api_key:
+    st.error("❌ Missing GROQ_API_KEY. Please add it to your .env file or Streamlit secrets.")
+else:
+    st.success("✅ API key loaded successfully.")
+
+# --- Optional check ---
+st.write("API Key loaded:", bool(groq_api_key))
+
+# --- Streamlit setup ---
+st.set_page_config(page_title="🤖 Shine Smart Chatbot", page_icon="💬")
+st.title("💬 Shine Smart Chatbot")
 st.markdown("Ask me anything or upload a text file for RAG-based answers!")
 
-# Initialize chatbot
+# --- Initialize chatbot agent ---
 agent = SmartChatAgent()
 
 # --- Upload text file for RAG ---
@@ -32,9 +39,4 @@ if st.button("Ask"):
         with st.spinner("Thinking..."):
             answer = agent.handle_query(user_query)
             st.success("Response:")
-            st.write(answer)
-    else:
-        st.warning("Please type a question first.")
-
-st.markdown("---")
-st.markdown("Built with ❤️ using Groq, Streamlit, and Sentence Transformers.")
+            st.writ
