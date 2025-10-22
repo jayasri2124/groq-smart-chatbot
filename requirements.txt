@@ -9,4 +9,10 @@ pandas
 sqlalchemy
 streamlit
 python-docx
+PyMuPDF
+fitz
+
+
+
+
 

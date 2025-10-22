@@ -1,42 +1,70 @@
-from chatbot_agent import SmartChatAgent
-from dotenv import load_dotenv
-import os
 import streamlit as st
+from chatbot_agent import SmartChatAgent
+from docx import Document        # for .docx files
+import fitz                      # for .pdf files (PyMuPDF)
+import io
 
-# --- Load environment variables first ---
-load_dotenv()
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="💬 Shine Smart Chatbot", layout="centered")
 
-# --- Get API Key (from .env or Streamlit secrets) ---
-groq_api_key = os.getenv("GROQ_API_KEY", None)
-
-if not groq_api_key:
-    st.error("❌ Missing GROQ_API_KEY. Please add it to your .env file or Streamlit secrets.")
-else:
-    st.success("✅ API key loaded successfully.")
-
-# --- Optional check ---
-st.write("API Key loaded:", bool(groq_api_key))
-
-# --- Streamlit setup ---
-st.set_page_config(page_title="🤖 Shine Smart Chatbot", page_icon="💬")
+# --- TITLE ---
 st.title("💬 Shine Smart Chatbot")
-st.markdown("Ask me anything or upload a text file for RAG-based answers!")
+st.markdown("Ask me anything or upload a text/Word/PDF file for RAG-based answers!")
 
-# --- Initialize chatbot agent ---
+# --- INIT CHATBOT AGENT ---
 agent = SmartChatAgent()
 
-# --- Upload text file for RAG ---
-uploaded_file = st.file_uploader("📁 Upload a .txt file,doc file", type=["txt"])
-if uploaded_file is not None:
-    text_data = uploaded_file.read().decode("utf-8")
-    agent.rag.add_file(text_data, uploaded_file.name)
-    st.success(f"✅ '{uploaded_file.name}' added to RAG knowledge base!")
+# --- FILE UPLOAD SECTION ---
+st.subheader("📁 Upload a .txt, .docx, or .pdf file for RAG")
+uploaded_file = st.file_uploader(
+    "Choose a file", 
+    type=["txt", "docx", "pdf"], 
+    help="Supports text, Word, and PDF files up to 200MB."
+)
 
-# --- Chat input area ---
-user_query = st.text_area("💬 Ask your question:")
+if uploaded_file is not None:
+    file_name = uploaded_file.name
+    text = ""
+
+    try:
+        if file_name.endswith(".txt"):
+            text = uploaded_file.read().decode("utf-8", errors="ignore")
+
+        elif file_name.endswith(".docx"):
+            # Read Word file from memory
+            doc = Document(io.BytesIO(uploaded_file.read()))
+            text = "\n".join([p.text for p in doc.paragraphs])
+
+        elif file_name.endswith(".pdf"):
+            # Read PDF pages
+            pdf_bytes = uploaded_file.read()
+            pdf_doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+            for page in pdf_doc:
+                text += page.get_text()
+
+        if text.strip():
+            agent.rag.add_file(text, file_name)
+            st.success(f"✅ File '{file_name}' added to RAG successfully!")
+        else:
+            st.warning("⚠️ The file appears to be empty or unreadable.")
+
+    except Exception as e:
+        st.error(f"⚠️ Error reading file: {e}")
+
+st.divider()
+
+# --- QUESTION SECTION ---
+st.subheader("💬 Ask your question:")
+question = st.text_area("Type your question here:")
+
 if st.button("Ask"):
-    if user_query.strip():
-        with st.spinner("Thinking..."):
-            answer = agent.handle_query(user_query)
-            st.success("Response:")
-            st.write("Response:", answer)
+    if question.strip():
+        with st.spinner("🤔 Thinking..."):
+            answer = agent.handle_query(question)
+        st.subheader("Response:")
+        st.write(answer)
+    else:
+        st.warning("Please enter a question before clicking Ask.")
+
+st.markdown("---")
+st.caption("Built with ❤️ using Groq, Streamlit, and Sentence Transformers.")

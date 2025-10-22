@@ -1,7 +1,9 @@
 import os
 from flask import Flask, request, render_template, jsonify
 from chatbot_agent import SmartChatAgent
-from docx import Document  # ✅ import for Word files
+from docx import Document  # ✅ import for Word file
+
+
 
 app = Flask(__name__, template_folder="templates")
 agent = SmartChatAgent()
