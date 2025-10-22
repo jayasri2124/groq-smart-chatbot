@@ -39,4 +39,4 @@ if st.button("Ask"):
         with st.spinner("Thinking..."):
             answer = agent.handle_query(user_query)
             st.success("Response:")
-            st.writ
+            st.write("Response:", answer)
