@@ -8,5 +8,5 @@ numpy
 pandas
 sqlalchemy
 streamlit
-
+python-docx
 
